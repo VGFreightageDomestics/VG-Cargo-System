@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VG Cargo | Track & Trace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --vg-blue: #0f1c3f; --vg-gold: #f59e0b; }
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--vg-blue) 0%, #1e3a8a 100%);
+            color: white; padding: 60px 20px; text-align: center; border-bottom: 5px solid var(--vg-gold);
+        }
+        
+        .search-box {
+            max-width: 600px; margin: -30px auto 30px; background: white; padding: 30px;
+            border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .result-card {
+            max-width: 600px; margin: 0 auto; display: none; /* Hidden by default */
+            background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); animation: fadeIn 0.5s;
+        }
+
+        .status-header { background: var(--vg-blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .status-body { padding: 25px; }
+
+        .timeline-item { border-left: 2px solid #ddd; padding-left: 20px; margin-left: 10px; position: relative; padding-bottom: 20px; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px;
+            background: var(--vg-gold); border-radius: 50%;
+        }
+        .timeline-item:last-child { border-left: none; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- HERO / LOGO -->
+    <div class="hero-section">
+        <h1 class="fw-bold"><i class="fas fa-shipping-fast"></i> VG CARGO</h1>
+        <p>Real-time Shipment Tracking System</p>
+    </div>
+
+    <!-- SEARCH BOX -->
+    <div class="search-box">
+        <label class="fw-bold text-muted mb-2">ENTER TRACKING NUMBER</label>
+        <div class="input-group mb-3">
+            <input type="text" id="trackNum" class="form-control form-control-lg" placeholder="ex. VG-1001" style="text-transform:uppercase;">
+            <button class="btn btn-primary btn-lg" style="background:var(--vg-blue);" onclick="trackCargo()">TRACK NOW</button>
+        </div>
+        <div id="loading" class="text-center text-muted" style="display:none;">Searching database...</div>
+        <div id="errorMsg" class="text-center text-danger fw-bold mt-2" style="display:none;"></div>
+    </div>
+
+    <!-- RESULT DISPLAY -->
+    <div id="resultCard" class="result-card">
+        <div class="status-header">
+            <h5 class="m-0 fw-bold" id="resTracking">VG-XXXX</h5>
+            <span class="badge bg-warning text-dark" id="resStatus">IN TRANSIT</span>
+        </div>
+        <div class="status-body">
+            <div class="row mb-4">
+                <div class="col-6">
+                    <small class="text-muted fw-bold">ORIGIN</small>
+                    <h5 id="resOrigin">Manila</h5>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted fw-bold">DESTINATION</small>
+                    <h5 id="resDest">Cebu</h5>
+                </div>
+            </div>
+            
+            <hr>
+            <h6 class="fw-bold mb-3 text-primary">SHIPMENT HISTORY</h6>
+            <div id="historyTimeline">
+                <!-- Dito ilalagay ng Javascript ang history -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // --- PASTE YOUR FIREBASE CONFIG HERE ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyCrDEUr1O5krXFHEB2hafLXuEumEcoSTxM",
+  authDomain: "vg-cargo-system-3.firebaseapp.com",
+  projectId: "vg-cargo-system-3",
+  storageBucket: "vg-cargo-system-3.firebasestorage.app",
+  messagingSenderId: "819520192535",
+  appId: "1:819520192535:web:8e42b272500f9b60e19c52"
+};
+        // ---------------------------------------
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.trackCargo = async function() {
+            const num = document.getElementById('trackNum').value.trim().toUpperCase();
+            const btn = document.querySelector('button');
+            const loader = document.getElementById('loading');
+            const err = document.getElementById('errorMsg');
+            const card = document.getElementById('resultCard');
+
+            if(!num) return;
+
+            // UI Reset
+            btn.disabled = true; loader.style.display = 'block'; err.style.display = 'none'; card.style.display = 'none';
+
+            try {
+                // HAHANAPIN ANG CARGO SA COLLECTION NA 'shipments'
+                const q = query(collection(db, "shipments"), where("trackingNo", "==", num));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    err.innerText = "Tracking number not found. Please check and try again.";
+                    err.style.display = 'block';
+                } else {
+                    // PAG MAY NAKITA
+                    const data = snap.docs[0].data();
+                    
+                    document.getElementById('resTracking').innerText = data.trackingNo;
+                    document.getElementById('resStatus').innerText = data.status;
+                    document.getElementById('resOrigin').innerText = data.origin;
+                    document.getElementById('resDest').innerText = data.destination;
+
+                    // History Loop (Kung may array na 'history' sa database)
+                    let timelineHtml = "";
+                    if(data.history && Array.isArray(data.history)) {
+                        data.history.forEach(h => {
+                            timelineHtml += `
+                            <div class="timeline-item">
+                                <small class="text-muted">${h.date}</small>
+                                <div class="fw-bold">${h.activity}</div>
+                                <small>${h.location}</small>
+                            </div>`;
+                        });
+                    } else {
+                        // Default kung walang history array
+                        timelineHtml = `<div class="timeline-item"><div class="fw-bold">Shipment Accepted</div><small>Origin Branch</small></div>`;
+                    }
+                    document.getElementById('historyTimeline').innerHTML = timelineHtml;
+                    card.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error(error);
+                err.innerText = "System Error. Please try again later.";
+                err.style.display = 'block';
+            }
+
+            btn.disabled = false; loader.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
