@@ -236,6 +236,19 @@
                 <h5 class="text-primary fw-bold">Internal Tracker</h5>
                 <div class="input-group mb-3"><input type="text" id="staffTrackInput" class="form-control" placeholder="Waybill No."><button class="btn btn-primary" onclick="staffTrackParcel()">Search</button></div>
                 <div id="staffTrackResult"></div>
+
+<!-- DESTINATION EDITOR -->
+<div id="destEditor" class="hidden mt-3">
+  <div class="card p-3 border-success">
+    <div class="fw-bold text-success mb-2">Update Destination</div>
+    <div class="input-group">
+      <input type="text" id="destInput" class="form-control" placeholder="Type destination (e.g. CEBU / CEB HUB)">
+      <button class="btn btn-success" onclick="saveDestination()">Save</button>
+    </div>
+    <small class="text-muted d-block mt-2">Note: This will save to Firestore field <code>destination</code>.</small>
+  </div>
+</div>
+<div id="staffTrackResult"></div>
                 <div id="reprintSection" class="hidden mt-3"><button class="btn btn-warning w-100 fw-bold btn-sm" onclick="reprintAll()">REPRINT ALL</button></div>
             </div>
         </div>
@@ -436,10 +449,40 @@
     }
 
     async function publicTrack(){ trackLogic(document.getElementById('publicSearchInput').value.trim(), document.getElementById('publicResult')); }
+    async function saveDestination(){
+  if(!currentTrackedData) return alert("Search a waybill first.");
+  const wb = currentTrackedData.waybill;
+  const dest = document.getElementById('destInput').value.trim();
+  if(!dest) return alert("Enter destination");
+
+  try{
+    await window.updateDoc(window.doc(window.db,"parcels",wb),{
+      destination: dest
+    });
+    alert("Destination saved!");
+    // refresh display
+    await staffTrackParcel();
+  }catch(e){
+    console.error(e);
+    alert(e?.message || String(e));
+  }
+}
+window.saveDestination = saveDestination;
+
     async function staffTrackParcel(){ 
         const wb=document.getElementById('staffTrackInput').value.trim(); const r=document.getElementById('staffTrackResult'); document.getElementById('reprintSection').classList.add('hidden');
         const d=await trackLogic(wb,r); 
-        if(d){ currentTrackedData=d; document.getElementById('reprintSection').classList.remove('hidden'); }
+        if(d){
+  currentTrackedData = d;
+  document.getElementById('reprintSection').classList.remove('hidden');
+
+  // show destination editor + preload value
+  document.getElementById('destEditor').classList.remove('hidden');
+  document.getElementById('destInput').value = (d.destination || '').toString();
+}else{
+  document.getElementById('destEditor').classList.add('hidden');
+}
+
     }
     
     async function trackLogic(wb, c){
@@ -479,4 +522,5 @@
     window.toggleCustomLoc=toggleCustomLoc;
 </script>
 </body>
+
 </html>
