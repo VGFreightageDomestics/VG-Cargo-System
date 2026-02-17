@@ -191,13 +191,13 @@
                         <option>Arrived at Hub</option><option>Out for Delivery</option><option>Delivered</option>
                     </select>
                     
-                    <!-- DINAMIKO NA ANG LOCATION LIST -->
+                    <!-- DYNAMIC LOCATION LIST -->
                     <select id="currentLocSelect" class="form-select mb-2" onchange="toggleCustomLoc()">
-                        <option value="" disabled selected>Loading Locations...</option>
+                        <option value="" disabled selected>Select Hub...</option>
                     </select>
                     
                     <input type="text" id="currentLocCustom" class="form-control mb-2 hidden" placeholder="Type NEW Location Name (e.g. CDO HUB)">
-                    <small id="customLocNote" class="text-success hidden mb-2" style="font-size:0.8rem"><i class="fas fa-check-circle"></i> This new location will be saved to the list.</small>
+                    <small id="customLocNote" class="text-success hidden mb-2" style="font-size:0.8rem"><i class="fas fa-check-circle"></i> New location will be saved to list.</small>
 
                     <button class="btn btn-success w-100" onclick="updateStatus()">UPDATE & SAVE</button>
                     <button class="btn btn-secondary w-100 mt-1" onclick="resetScan()">Cancel</button>
@@ -258,7 +258,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Export Firebase functions globally
     window.db = db; window.auth = auth;
     window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc; window.updateDoc = updateDoc;
     window.arrayUnion = arrayUnion; window.collection = collection; window.addDoc = addDoc;
@@ -272,7 +271,7 @@
             document.getElementById('displayEmail').innerText = user.email;
             window.currentUserEmail = user.email;
             
-            // Load Locations Dropdown Realtime
+            // LOAD LOCATIONS with Safety Check
             loadLocations();
 
             let role = "Staff"; 
@@ -313,27 +312,40 @@
         document.getElementById('printArea').style.display = 'none';
     }
 
-    // --- NEW: DYNAMIC LOCATION SYSTEM ---
+    // --- ROBUST LOCATION SYSTEM ---
     function loadLocations() {
-        // Listen to 'settings/locations' document in realtime
-        window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
-            const select = document.getElementById('currentLocSelect');
-            let options = "";
-            let hubs = [];
+        const select = document.getElementById('currentLocSelect');
+        const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
+
+        // Listen to database
+        window.onSnapshot(window.doc(window.db, "settings", "locations"), 
+        (docSnap) => {
+            let hubs = defaultHubs; // Fallback
 
             if (docSnap.exists() && docSnap.data().list) {
                 hubs = docSnap.data().list;
             } else {
-                // Default List if Database is empty
-                hubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
+                // If it doesn't exist yet, we can create it silently or just use default
+                console.log("No custom locations found, using default.");
             }
 
-            // Populate Dropdown
+            // Clean list (remove duplicates and empty strings)
+            hubs = [...new Set(hubs)].filter(h => h);
+
+            let options = `<option value="" disabled selected>Select Hub...</option>`;
             hubs.sort().forEach(hub => {
                 options += `<option value="${hub}">${hub}</option>`;
             });
             
-            // Add 'Other' option at the end
+            // Add 'Other' option
+            options += `<option value="Other">➕ Add New Location...</option>`;
+            select.innerHTML = options;
+        }, 
+        (error) => {
+            console.error("Error loading locations:", error);
+            // If error (like permission issue), show Default list so it's not "Loading..." forever
+            let options = `<option value="" disabled selected>Select Hub...</option>`;
+            defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
             options += `<option value="Other">➕ Add New Location...</option>`;
             select.innerHTML = options;
         });
@@ -361,7 +373,6 @@
         let l = document.getElementById('currentLocSelect').value;
         let isCustom = false;
 
-        // If 'Other' is selected, use the text input
         if(l === "Other") {
             l = document.getElementById('currentLocCustom').value.trim();
             isCustom = true;
@@ -383,8 +394,9 @@
             
             // 2. IF CUSTOM LOCATION: Save to Global List
             if (isCustom) {
-                // Check if 'settings/locations' exists, if not create it, else update it
                 const settingsRef = window.doc(window.db, "settings", "locations");
+                // Check if doc exists first to avoid overwriting with just one item if logic fails
+                // But setDoc with merge:true handles creation nicely
                 await window.setDoc(settingsRef, {
                     list: window.arrayUnion(l)
                 }, { merge: true });
