@@ -20,26 +20,11 @@
         .navbar-brand { display: flex; align-items: center; }
         .navbar-brand img { height: 40px; margin-right: 10px; }
         
-        /* HERO SECTION */
-        .hero-section { 
-            background: linear-gradient(135deg, var(--vg-blue) 0%, #000c24 100%); 
-            color: white; 
-            padding: 40px 20px; 
-            text-align: center; 
-            border-radius: 0 0 20px 20px; 
-            margin-bottom: 30px; 
-        }
-
-        /* Search Box Desktop */
-        .search-box { 
-            max-width: 600px; margin: 0 auto; background: white; padding: 8px; 
-            border-radius: 50px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            width: 100%; box-sizing: border-box;
-        }
+        .hero-section { background: linear-gradient(135deg, var(--vg-blue) 0%, #000c24 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 30px; }
+        .search-box { max-width: 600px; margin: 0 auto; background: white; padding: 8px; border-radius: 50px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; box-sizing: border-box; }
         .search-input { border: none; flex-grow: 1; padding: 10px 20px; font-size: 1.1rem; outline: none; border-radius: 50px; width: 100%; }
         .search-btn { background-color: var(--vg-green); color: white; border: none; padding: 10px 30px; border-radius: 50px; font-weight: bold; transition: 0.3s; white-space: nowrap; }
         
-        /* MOBILE ADJUSTMENTS */
         @media (max-width: 576px) {
             .navbar-brand span { font-size: 1rem; }
             .hero-section { padding: 30px 15px; }
@@ -53,9 +38,6 @@
         .card { border-top: 5px solid var(--vg-green); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .hidden { display: none !important; }
         
-        /* Tracking Card Styles */
-        .track-label { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; font-weight: bold; letter-spacing: 0.5px; }
-        .track-val { font-weight: 600; color: #212529; font-size: 0.95rem; }
         .timeline-item { border-left: 2px solid var(--vg-blue); padding-left: 20px; padding-bottom: 20px; position: relative; }
         .timeline-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--vg-blue); }
         .timeline-item:last-child { border-left: none; }
@@ -63,63 +45,34 @@
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 31, 96, 0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; }
 
-        /* --- RESTORED ORIGINAL PRINT STYLES (BOXED LAYOUT) --- */
+        /* SCANNER CAMERA FIX */
+        #reader { width: 100%; min-height: 300px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+
+        /* PRINT STYLES */
         #printArea { display: none; }
         @media print {
             #publicView, #staffView, #loginOverlay, .navbar { display: none !important; }
             #printArea { display: block !important; width: 100%; margin: 0; padding: 0; }
-            
             @page { size: 100mm 150mm; margin: 0; }
-
-            .sticker-page { 
-                width: 100mm; height: 149mm; margin: 0 auto; 
-                border: 2px solid black; 
-                background: white; color: black;
-                font-family: 'Arial', sans-serif; 
-                display: flex; flex-direction: column;
-                box-sizing: border-box; padding: 0; 
-                page-break-after: always; break-after: always; page-break-inside: avoid;
-                overflow: hidden;
-            }
-            .sticker-page:last-child { page-break-after: auto; }
-
-            /* HEADER */
+            .sticker-page { width: 100mm; height: 149mm; margin: 0 auto; border: 2px solid black; background: white; color: black; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; box-sizing: border-box; padding: 0; page-break-after: always; break-after: always; page-break-inside: avoid; overflow: hidden; }
             .wb-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-bottom: 2px solid black; background: #eee; -webkit-print-color-adjust: exact; }
             .wb-brand-box { display: flex; align-items: center; gap: 5px; }
             .wb-logo { height: 20px; }
             .wb-company-text { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: bold; color: black; letter-spacing: 0.5px; }
             .wb-date { font-size: 9px; font-weight: bold; }
-            
-            /* DESTINATION CODE (BLACK BAR) */
             .wb-sort-zone { background: black; color: white; text-align: center; font-family: 'Oswald', sans-serif; font-size: 42px; font-weight: bold; line-height: 1; padding: 2px 0; letter-spacing: 3px; text-transform: uppercase; border-bottom: 2px solid black; -webkit-print-color-adjust: exact; }
-            
-            /* HANDLING WARNING */
-            .wb-warning-banner {
-                background: white; color: black;
-                border-bottom: 2px solid black;
-                text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900;
-                font-size: 24px; padding: 5px;
-                text-transform: uppercase; letter-spacing: 2px; display: none;
-            }
+            .wb-warning-banner { background: white; color: black; border-bottom: 2px solid black; text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900; font-size: 24px; padding: 5px; text-transform: uppercase; letter-spacing: 2px; display: none; }
             .wb-warning-banner.show { display: block; background: black !important; color: white !important; -webkit-print-color-adjust: exact; }
-
-            /* QR & WAYBILL NUMBER */
             .wb-qr-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 2px solid black; }
             .wb-id-box { text-align: left; }
             .wb-id-label { font-size: 8px; color: #555; font-weight: bold; text-transform: uppercase; }
             .wb-id-text { font-size: 26px; font-weight: 900; letter-spacing: 1px; font-family: 'Oswald', sans-serif; }
             .wb-qr-code { padding: 0; } 
-            
-            /* SENDER BOX */
             .wb-sender { padding: 8px; border-bottom: 1px solid black; font-size: 11px; line-height: 1.2; }
-            
-            /* RECEIVER BOX (BIG) */
             .wb-receiver { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
             .wb-tag { background: black; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; display: inline-block; width: fit-content; margin-bottom: 5px; -webkit-print-color-adjust: exact; }
             .wb-rcv-name { font-size: 32px; font-weight: 900; line-height: 1.1; margin-bottom: 5px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
             .wb-rcv-addr { font-size: 14px; font-weight: bold; line-height: 1.2; margin-bottom: 3px; }
-            
-            /* FOOTER GRID */
             .wb-footer { display: flex; border-top: 3px solid black; height: 50px; }
             .wb-f-item { flex: 1; border-right: 2px solid black; display: flex; flex-direction: column; align-items: center; justify-content: center; }
             .wb-f-item:last-child { border-right: none; }
@@ -193,14 +146,13 @@
                 <h5 class="text-primary fw-bold mb-3">Create Waybill</h5>
                 <div class="input-group mb-3"><input type="text" id="wbInput" class="form-control fw-bold"><button class="btn btn-secondary" onclick="generateRandomWB()">Auto</button></div>
                 
-                <!-- INPUTS: ORIGIN & DESTINATION -->
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="small text-muted fw-bold">ORIGIN</label>
+                        <label class="small text-muted fw-bold">ORIGIN BRANCH</label>
                         <input type="text" id="shipperAddr" class="form-control fw-bold" placeholder="e.g. Manila Hub">
                     </div>
                     <div class="col-6">
-                        <label class="small text-muted fw-bold">DESTINATION</label>
+                        <label class="small text-muted fw-bold">DESTINATION BRANCH</label>
                         <input type="text" id="consigneeAddr" class="form-control fw-bold" placeholder="e.g. Davao Hub">
                     </div>
                 </div>
@@ -224,17 +176,24 @@
             </div>
         </div>
 
-        <!-- SCANNER -->
+        <!-- SCANNER SECTION (UPDATED CAMERA LOGIC) -->
         <div id="scanner" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold">Scanner</h5>
+                <!-- Camera Container -->
                 <div id="reader"></div>
+                
                 <div id="scanAction" class="hidden mt-3">
                     <div class="alert alert-info">Detected: <strong id="detectedWB"></strong></div>
+                    
+                    <label class="fw-bold small text-muted">CURRENT LOCATION / ACTION</label>
                     <select id="currentLocSelect" class="form-select mb-2" onchange="toggleCustomLoc()">
-                        <option value="" disabled selected>Select Hub...</option>
+                        <option value="" disabled selected>Select...</option>
                     </select>
+                    
                     <input type="text" id="currentLocCustom" class="form-control mb-2 hidden" placeholder="Type NEW Location Name">
+                    <small id="customLocNote" class="text-success hidden mb-2" style="font-size:0.8rem"><i class="fas fa-check-circle"></i> Will be saved to list.</small>
+
                     <button class="btn btn-success w-100" onclick="updateStatus()">UPDATE & SAVE</button>
                     <button class="btn btn-secondary w-100 mt-1" onclick="resetScan()">Cancel</button>
                 </div>
@@ -353,12 +312,55 @@
     function showPage(id) {
         document.querySelectorAll('.staff-page').forEach(d => d.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'scanner') startCamera(); else stopCamera();
+        // Manage Scanner Camera
+        if(id === 'scanner') startCamera(); 
+        else stopCamera();
+        
         if(id === 'users') loadLogs();
         document.getElementById('printArea').innerHTML = '';
         document.getElementById('printArea').style.display = 'none';
     }
 
+    // --- CAMERA FIX: STOP PREVIOUS INSTANCE ---
+    function stopCamera() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear().catch(err => console.log("Stop failed", err));
+            html5QrcodeScanner = null;
+        }
+    }
+
+    function startCamera() {
+        stopCamera(); // Ensure clean slate
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+            fps: 10, 
+            qrbox: 250,
+            aspectRatio: 1.0
+        });
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    }
+
+    function onScanSuccess(decodedText) {
+        // Stop scanning upon success
+        html5QrcodeScanner.clear();
+        document.getElementById('scanAction').classList.remove('hidden');
+        document.getElementById('detectedWB').innerText = decodedText;
+    }
+
+    function onScanError(errorMessage) {
+        // Just ignore errors to avoid console spam
+    }
+
+    function resetScan() {
+        document.getElementById('scanAction').classList.add('hidden');
+        document.getElementById('currentLocSelect').value = "";
+        document.getElementById('currentLocCustom').classList.add('hidden');
+        document.getElementById('customLocNote').classList.add('hidden');
+        
+        // Restart Camera for next scan
+        startCamera();
+    }
+
+    // --- LOCATION LOGIC ---
     function loadLocations() {
         const select = document.getElementById('currentLocSelect');
         const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
@@ -369,11 +371,6 @@
             hubs = [...new Set(hubs)].filter(h => h);
             let options = `<option value="" disabled selected>Select Action / Location...</option>`;
             hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
-            options += `<option value="Other">➕ Add New Location...</option>`;
-            select.innerHTML = options;
-        }, () => {
-            let options = `<option value="" disabled selected>Select Hub...</option>`;
-            defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
             options += `<option value="Other">➕ Add New Location...</option>`;
             select.innerHTML = options;
         });
@@ -405,22 +402,18 @@
         } catch(e) { alert("Error: " + e.message); }
     }
 
-    // --- REPRINT FUNCTION (RANGE) ---
+    // --- REPRINT ---
     function reprintRange() {
         if(!currentTrackedData) return;
         const start = parseInt(document.getElementById('rpStart').value);
         const end = parseInt(document.getElementById('rpEnd').value);
         const total = parseInt(currentTrackedData.details.qty);
-
-        if(start < 1 || end > total || start > end) {
-            return alert(`Invalid Range. Max is ${total}.`);
-        }
-
+        if(start < 1 || end > total || start > end) return alert(`Invalid Range. Max is ${total}.`);
         generatePrintLayout(currentTrackedData, start, end);
         setTimeout(() => window.print(), 800);
     }
 
-    // --- RESTORED LAYOUT (BOXED) ---
+    // --- RESTORED BOXED LAYOUT ---
     function generatePrintLayout(data, startNum, endNum) {
         const printArea = document.getElementById('printArea');
         printArea.innerHTML = ""; printArea.style.display = 'flex';
@@ -442,7 +435,6 @@
             const sticker = document.createElement('div');
             sticker.className = 'sticker-page';
             
-            // NOTE: RESTORED ORIGINAL LAYOUT STRUCTURE
             sticker.innerHTML = `
                 <div class="wb-header">
                     <div class="wb-brand-box">
@@ -483,14 +475,10 @@
             new QRCode(document.getElementById(`qr-${data.waybill}-${i}`), { text: data.waybill, width: 140, height: 140 });
         }
     }
-
-    function startCamera(){ if(!html5QrcodeScanner){ html5QrcodeScanner=new Html5QrcodeScanner("reader",{fps:10,qrbox:250}); html5QrcodeScanner.render((t)=>{document.getElementById('scanAction').classList.remove('hidden');document.getElementById('detectedWB').innerText=t;html5QrcodeScanner.pause();}); } }
-    function stopCamera(){ if(html5QrcodeScanner){html5QrcodeScanner.clear().catch(()=>{});html5QrcodeScanner=null;} }
-    function resetScan(){ document.getElementById('scanAction').classList.add('hidden'); document.getElementById('currentLocSelect').value=""; document.getElementById('currentLocCustom').classList.add('hidden'); document.getElementById('customLocNote').classList.add('hidden'); if(html5QrcodeScanner)html5QrcodeScanner.resume(); }
     
     function generateRandomWB(){ document.getElementById('wbInput').value="VG-"+Math.floor(100000+Math.random()*900000); }
     
-    // UPDATED CREATE FUNCTION
+    // CREATE FUNCTION (MAPPED FIELDS)
     async function createParcel(){
         const wb=document.getElementById('wbInput').value;
         const d={
@@ -518,7 +506,6 @@
         if(d){ 
             currentTrackedData=d; 
             document.getElementById('reprintSection').classList.remove('hidden'); 
-            // Set Default Reprint Values
             document.getElementById('rpEnd').value = d.details.qty;
         } 
     }
