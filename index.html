@@ -15,7 +15,6 @@
         body { background-color: #f8f9fa; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         :root { --vg-blue: #001f60; --vg-green: #00c853; --vg-red: #d32f2f; }
 
-        /* UI Styles */
         .navbar { background-color: white; border-bottom: 3px solid var(--vg-blue); }
         .navbar-brand { display: flex; align-items: center; }
         .navbar-brand img { height: 40px; margin-right: 10px; }
@@ -41,9 +40,9 @@
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 31, 96, 0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; }
 
-        /* SCANNER CAMERA */
-        #reader { width: 100%; min-height: 300px; background: #000; border-radius: 10px; margin-bottom: 15px; }
-
+        /* FIXED SCANNER UI */
+        #reader { width: 100%; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 15px; min-height: 300px; }
+        
         /* PRINT STYLES */
         #printArea { display: none; }
         @media print {
@@ -57,23 +56,15 @@
             .wb-logo { height: 20px; }
             .wb-company-text { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: bold; color: black; letter-spacing: 0.5px; }
             .wb-date { font-size: 9px; font-weight: bold; }
-            
             .wb-sort-zone { background: black; color: white; text-align: center; font-family: 'Oswald', sans-serif; font-size: 42px; font-weight: bold; line-height: 1; padding: 2px 0; letter-spacing: 3px; text-transform: uppercase; border-bottom: 2px solid black; -webkit-print-color-adjust: exact; }
-            
-            .wb-warning-banner {
-                background: white; color: black; border-bottom: 2px solid black;
-                text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900;
-                font-size: 24px; padding: 5px; text-transform: uppercase; letter-spacing: 2px; display: none;
-            }
+            .wb-warning-banner { background: white; color: black; border-bottom: 2px solid black; text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900; font-size: 24px; padding: 5px; text-transform: uppercase; letter-spacing: 2px; display: none; }
             .wb-warning-banner.show { display: block; background: black !important; color: white !important; -webkit-print-color-adjust: exact; }
-
             .wb-qr-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 2px solid black; }
             .wb-id-box { text-align: left; }
             .wb-id-label { font-size: 8px; color: #555; font-weight: bold; text-transform: uppercase; }
             .wb-id-text { font-size: 26px; font-weight: 900; letter-spacing: 1px; font-family: 'Oswald', sans-serif; }
             .wb-qr-code { padding: 0; } 
-            
-            .wb-sender { padding: 8px; border-bottom: 1px solid black; font-size: 11px; line-height: 1.2; }
+            .wb-sender { padding: 8px; border-bottom: 1px solid black; font-size: 12px; line-height: 1.2; }
             .wb-receiver { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
             .wb-tag { background: black; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; display: inline-block; width: fit-content; margin-bottom: 5px; -webkit-print-color-adjust: exact; }
             .wb-rcv-name { font-size: 32px; font-weight: 900; line-height: 1.1; margin-bottom: 5px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
@@ -150,14 +141,27 @@
             <div class="card p-4">
                 <h5 class="text-primary fw-bold mb-3">Create Waybill</h5>
                 <div class="input-group mb-3"><input type="text" id="wbInput" class="form-control fw-bold"><button class="btn btn-secondary" onclick="generateRandomWB()">Auto</button></div>
+                
                 <div class="row g-2 mb-3">
-                    <div class="col-6"><label class="small text-muted fw-bold">SHIPPER INFO</label><input type="text" id="shipperName" class="form-control mb-1" placeholder="Sender Name"><input type="text" id="shipperAddr" class="form-control mb-1" placeholder="Origin Address"><input type="text" id="shipperContact" class="form-control" placeholder="Contact #"></div>
-                    <div class="col-6"><label class="small text-muted fw-bold">CONSIGNEE INFO</label><input type="text" id="consigneeName" class="form-control mb-1" placeholder="Receiver Name"><input type="text" id="consigneeAddr" class="form-control mb-1" placeholder="Destination Address"><input type="text" id="consigneeContact" class="form-control" placeholder="Contact #"></div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">SHIPPER INFO</label>
+                        <input type="text" id="shipperName" class="form-control mb-1" placeholder="Sender Name">
+                        <input type="text" id="shipperAddr" class="form-control mb-1" placeholder="Origin / Address">
+                        <input type="text" id="shipperContact" class="form-control" placeholder="Contact #">
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold">CONSIGNEE INFO</label>
+                        <input type="text" id="consigneeName" class="form-control mb-1" placeholder="Receiver Name">
+                        <input type="text" id="consigneeAddr" class="form-control mb-1" placeholder="Destination / Address">
+                        <input type="text" id="consigneeContact" class="form-control" placeholder="Contact #">
+                    </div>
                 </div>
+                
                 <div class="row g-2 mb-3">
                     <div class="col-6"><label class="small">Total Qty</label><input type="number" id="qty" class="form-control" placeholder="1" value="1"></div>
                     <div class="col-6"><label class="small">Weight (kg)</label><input type="text" id="weight" class="form-control" placeholder="0"></div>
                 </div>
+                
                 <div class="mb-3">
                     <label class="fw-bold small text-muted">SPECIAL HANDLING</label>
                     <select id="handling" class="form-select fw-bold border-warning">
@@ -167,39 +171,58 @@
                         <option value="FRAGILE & PERISHABLE">⚠️ FRAGILE & PERISHABLE</option>
                     </select>
                 </div>
+
                 <button class="btn btn-primary w-100 fw-bold" onclick="createParcel()">SAVE & PRINT</button>
             </div>
         </div>
 
-        <!-- SCANNER (RESTORED DROPDOWNS) -->
+        <!-- SCANNER (RESTORED ORIGINAL UI) -->
         <div id="scanner" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold">Scanner</h5>
+                
+                <!-- CAMERA -->
                 <div id="reader"></div>
+                
+                <!-- ACTION AREA -->
                 <div id="scanAction" class="hidden mt-3">
-                    <div class="alert alert-info py-2 text-center mb-2">Detected: <strong id="detectedWB">...</strong></div>
+                    <div class="alert alert-info py-2 text-center mb-3">
+                        DETECTED: <strong id="detectedWB" class="text-dark">...</strong>
+                    </div>
                     
-                    <label class="small fw-bold text-muted">STATUS</label>
-                    <select id="newStatus" class="form-select mb-2 fw-bold">
-                        <option value="" disabled selected>Select Status</option>
-                        <option>Picked Up</option>
-                        <option>Departed Origin</option>
-                        <option>In Transit</option>
-                        <option>Arrived at Hub</option>
-                        <option>Departed Hub</option>
-                        <option>Out for Delivery</option>
-                        <option>Delivered</option>
-                        <option>RTS (Return To Sender)</option>
-                    </select>
-                    
-                    <label class="small fw-bold text-muted">CURRENT LOCATION</label>
-                    <select id="currentLocSelect" class="form-select mb-2 fw-bold" onchange="toggleCustomLoc()">
-                        <option value="" disabled selected>Select Hub...</option>
-                    </select>
-                    <input type="text" id="currentLocCustom" class="form-control mb-2 hidden" placeholder="Type NEW Location Name">
-                    
-                    <button class="btn btn-success w-100 mt-2 fw-bold" onclick="updateStatus()">UPDATE STATUS</button>
-                    <button class="btn btn-secondary w-100 mt-1 btn-sm" onclick="resetScan()">Cancel</button>
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">STATUS</label>
+                        <select id="newStatus" class="form-select fw-bold">
+                            <option value="" disabled selected>Select Status</option>
+                            <option>Picked Up</option>
+                            <option>Departed Origin</option>
+                            <option>In Transit</option>
+                            <option>Arrived at Hub</option>
+                            <option>Departed Hub</option>
+                            <option>Out for Delivery</option>
+                            <option>Delivered</option>
+                            <option>RTS (Return To Sender)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">CURRENT LOCATION</label>
+                        <select id="currentLocSelect" class="form-select fw-bold" onchange="toggleCustomLoc('currentLocSelect','currentLocCustom')">
+                            <option value="" disabled selected>Loading...</option>
+                        </select>
+                        <input type="text" id="currentLocCustom" class="form-control mt-2 hidden" placeholder="Type NEW Location Name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted">DESTINATION (Next Stop)</label>
+                        <select id="destLocSelect" class="form-select fw-bold" onchange="toggleCustomLoc('destLocSelect','destLocCustom')">
+                            <option value="" disabled selected>Loading...</option>
+                        </select>
+                        <input type="text" id="destLocCustom" class="form-control mt-2 hidden" placeholder="Type NEW Destination">
+                    </div>
+
+                    <button class="btn btn-success w-100 py-2 fw-bold" onclick="updateStatus()">UPDATE STATUS</button>
+                    <button class="btn btn-secondary w-100 mt-2 btn-sm" onclick="resetScan()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -246,6 +269,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } 
     from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
+    // CONFIG (SAFE)
     const firebaseConfig = {
       apiKey: "AIzaSyCrDEUr1O5krXFHEB2hafLXuEumEcoSTxM",
       authDomain: "vg-cargo-system-3.firebaseapp.com",
@@ -271,13 +295,16 @@
         if (user) {
             document.getElementById('displayEmail').innerText = user.email;
             window.currentUserEmail = user.email;
-            loadLocations();
+            loadLocations(); // START LOCATION LISTENER
+            
             let role = "Staff"; 
             if (user.email === "nephiprudencio68@gmail.com") role = "Admin"; 
             else { try { const d = await getDoc(doc(db, "users", user.email.toLowerCase())); if(d.exists()) role = d.data().role; } catch(e){} }
+            
             document.getElementById('roleBadge').innerText = role;
             if (role === "Admin") { document.getElementById('roleBadge').classList.replace('bg-secondary', 'bg-danger'); document.getElementById('adminMenuBtn').classList.remove('hidden'); } 
             else { document.getElementById('roleBadge').classList.replace('bg-danger', 'bg-secondary'); document.getElementById('adminMenuBtn').classList.add('hidden'); }
+            
             document.getElementById('publicView').classList.add('hidden'); document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('staffView').classList.remove('hidden'); showPage('create');
         } else {
@@ -302,43 +329,25 @@
     function showPage(id) {
         document.querySelectorAll('.staff-page').forEach(d => d.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'scanner') startCamera(); else stopCamera();
+        if(id === 'scanner') startCamera(); 
+        else stopCamera();
+        
         if(id === 'users') loadLogs();
         document.getElementById('printArea').innerHTML = '';
         document.getElementById('printArea').style.display = 'none';
     }
 
-    function loadLocations() {
-        const select = document.getElementById('currentLocSelect');
-        const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
-        window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
-            let hubs = defaultHubs;
-            if (docSnap.exists() && docSnap.data().list) hubs = docSnap.data().list;
-            if(!hubs.includes("DELIVERED")) hubs.push("DELIVERED");
-            hubs = [...new Set(hubs)].filter(h => h);
-            let options = `<option value="" disabled selected>Select Location...</option>`;
-            hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
-            options += `<option value="Other">➕ Add New Location...</option>`;
-            select.innerHTML = options;
-        }, () => {
-            let options = `<option value="" disabled selected>Select Location...</option>`;
-            defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
-            options += `<option value="Other">➕ Add New Location...</option>`;
-            select.innerHTML = options;
-        });
-    }
-
-    function toggleCustomLoc() {
-        const select = document.getElementById('currentLocSelect');
-        const customInput = document.getElementById('currentLocCustom');
-        if (select.value === "Other") { customInput.classList.remove('hidden'); customInput.focus(); } else { customInput.classList.add('hidden'); }
-    }
-
-    // --- SCANNER LOGIC (RESTORED DROPDOWNS) ---
+    // --- CAMERA FIX ---
     function stopCamera() { if (html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; } }
     function startCamera() {
         stopCamera();
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, aspectRatio: 1.0 });
+        // Use standard Html5QrcodeScanner with simplified config
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+            fps: 10, 
+            qrbox: 250,
+            aspectRatio: 1.0,
+            showTorchButtonIfSupported: true
+        });
         html5QrcodeScanner.render(onScanSuccess, (e)=>{});
     }
     function onScanSuccess(decodedText) {
@@ -351,26 +360,80 @@
         document.getElementById('currentLocSelect').value = "";
         document.getElementById('newStatus').value = "";
         document.getElementById('currentLocCustom').classList.add('hidden');
+        document.getElementById('destLocSelect').value = "";
+        document.getElementById('destLocCustom').classList.add('hidden');
         startCamera();
     }
 
+    // --- LOCATION LOGIC ---
+    function loadLocations() {
+        const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
+        window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
+            let hubs = defaultHubs;
+            if (docSnap.exists() && docSnap.data().list) hubs = docSnap.data().list;
+            if(!hubs.includes("DELIVERED")) hubs.push("DELIVERED");
+            hubs = [...new Set(hubs)].filter(h => h);
+            
+            let options = `<option value="" disabled selected>Select...</option>`;
+            hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
+            options += `<option value="Other">➕ Add New Location...</option>`;
+            
+            // Populate BOTH dropdowns
+            document.getElementById('currentLocSelect').innerHTML = options;
+            document.getElementById('destLocSelect').innerHTML = options;
+        });
+    }
+
+    function toggleCustomLoc(selectId, inputId) {
+        const select = document.getElementById(selectId);
+        const input = document.getElementById(inputId);
+        if (select.value === "Other") { input.classList.remove('hidden'); input.focus(); } 
+        else { input.classList.add('hidden'); }
+    }
+
+    // --- RESTORED UPDATE LOGIC ---
     async function updateStatus(){ 
         const wb = document.getElementById('detectedWB').innerText; 
         const status = document.getElementById('newStatus').value;
-        let l = document.getElementById('currentLocSelect').value;
-        let isCustom = false;
-        if(l === "Other") { l = document.getElementById('currentLocCustom').value.trim(); isCustom = true; }
         
-        if(!status || !l) return alert("Select Status and Location");
+        let loc = document.getElementById('currentLocSelect').value;
+        if(loc === "Other") loc = document.getElementById('currentLocCustom').value.trim();
+        
+        let dest = document.getElementById('destLocSelect').value;
+        if(dest === "Other") dest = document.getElementById('destLocCustom').value.trim();
+
+        if(!status || !loc) return alert("Status and Location are required");
 
         try{ 
-            await window.updateDoc(window.doc(window.db,"parcels",wb), { currentStatus: status, history: window.arrayUnion({ status: status, location: l, time: new Date().toLocaleString(), user: window.currentUserEmail }) }); 
-            if (isCustom) { await window.setDoc(window.doc(window.db, "settings", "locations"), { list: window.arrayUnion(l) }, { merge: true }); }
-            alert(`Updated: ${status} @ ${l}`); logAction("UPDATE", `${wb} -> ${status} @ ${l}`); resetScan(); 
+            // 1. Update History
+            await window.updateDoc(window.doc(window.db,"parcels",wb), {
+                currentStatus: status,
+                history: window.arrayUnion({
+                    status: status,
+                    location: loc,
+                    time: new Date().toLocaleString(),
+                    user: window.currentUserEmail
+                })
+            });
+            
+            // 2. Update Destination (if provided)
+            if(dest) {
+                await window.updateDoc(window.doc(window.db,"parcels",wb), { "consignee.addr": dest });
+            }
+
+            // 3. Save Custom Locations
+            if (loc && !document.getElementById('currentLocSelect').querySelector(`option[value="${loc}"]`)) {
+                 await window.setDoc(window.doc(window.db, "settings", "locations"), { list: window.arrayUnion(loc) }, { merge: true });
+            }
+            if (dest && !document.getElementById('destLocSelect').querySelector(`option[value="${dest}"]`)) {
+                 await window.setDoc(window.doc(window.db, "settings", "locations"), { list: window.arrayUnion(dest) }, { merge: true });
+            }
+
+            alert("Status Updated!"); resetScan(); 
         } catch(e) { alert("Error: " + e.message); }
     }
 
-    // --- PRINT LAYOUT (ROXAS ADDED) ---
+    // --- BOXED LAYOUT PRINT (RESTORED) ---
     function generatePrintLayout(data, startNum, endNum) {
         const printArea = document.getElementById('printArea');
         printArea.innerHTML = ""; printArea.style.display = 'flex';
@@ -381,10 +444,10 @@
         else if(dest.includes("MANILA") || dest.includes("MNL")) destinationCode = "MNL";
         else if(dest.includes("CEBU")) destinationCode = "CEB";
         else if(dest.includes("ILOILO")) destinationCode = "ILO";
-        else if(dest.includes("ROXAS")) destinationCode = "ROX";
-        else if(dest.includes("BACOLOD")) destinationCode = "BCD";
         else if(dest.includes("CAGAYAN") || dest.includes("CDO")) destinationCode = "CGY";
         else if(dest.includes("GENSAN")) destinationCode = "GES";
+        else if(dest.includes("ROXAS")) destinationCode = "ROX";
+        else if(dest.includes("BACOLOD")) destinationCode = "BCD";
         else if(dest.includes("BUTUAN")) destinationCode = "BUT";
         else if(dest.includes("ZAMBOANGA")) destinationCode = "ZAM";
 
@@ -417,7 +480,7 @@
                 </div>
                 
                 <div class="wb-sender">
-                    <strong>FROM:</strong> ${data.shipper.name}<br>
+                    <strong>FROM:</strong><br>
                     ${data.shipper.addr}
                 </div>
                 
