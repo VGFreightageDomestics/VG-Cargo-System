@@ -137,14 +137,13 @@
             </div>
         </div>
 
+        <!-- CREATE WAYBILL TAB -->
         <div id="create" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold mb-3">Create Waybill</h5>
                 
-                <!-- INPUT FORM -->
                 <div id="createFormContainer">
                     <div class="input-group mb-3"><input type="text" id="wbInput" class="form-control fw-bold"><button class="btn btn-secondary" onclick="generateRandomWB()">Auto</button></div>
-                    
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label class="small text-muted fw-bold">SHIPPER INFO</label>
@@ -159,12 +158,10 @@
                             <input type="text" id="consigneeContact" class="form-control" placeholder="Contact #">
                         </div>
                     </div>
-                    
                     <div class="row g-2 mb-3">
                         <div class="col-6"><label class="small">Total Qty</label><input type="number" id="qty" class="form-control" placeholder="1" value="1"></div>
                         <div class="col-6"><label class="small">Weight (kg)</label><input type="text" id="weight" class="form-control" placeholder="0"></div>
                     </div>
-                    
                     <div class="mb-3">
                         <label class="fw-bold small text-muted">SPECIAL HANDLING</label>
                         <select id="handling" class="form-select fw-bold border-warning">
@@ -174,17 +171,15 @@
                             <option value="FRAGILE & PERISHABLE">⚠️ FRAGILE & PERISHABLE</option>
                         </select>
                     </div>
-
                     <button class="btn btn-primary w-100 fw-bold py-2" onclick="createParcel()">SAVE</button>
                 </div>
 
-                <!-- SUCCESS / PRINT SELECTION SCREEN (Hidden by default) -->
+                <!-- SUCCESS / PRINT SELECTION SCREEN -->
                 <div id="createPrintOptions" class="hidden text-center">
                     <div class="alert alert-success">
                         <h4 class="fw-bold mb-0"><i class="fas fa-check-circle"></i> SAVED!</h4>
                         <small id="cpWb" class="fw-bold">VG-XXXXXX</small>
                     </div>
-                    
                     <h6 class="fw-bold text-muted small mt-4">SELECT STICKERS TO PRINT</h6>
                     <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
                         <div class="text-end"><small>From:</small></div>
@@ -192,37 +187,50 @@
                         <div><small>to</small></div>
                         <input type="number" id="cpEnd" class="form-control text-center fw-bold border-primary" style="width:70px;" value="1" min="1">
                     </div>
-
                     <button class="btn btn-dark w-100 fw-bold py-3 mb-2" onclick="printCreatedRange()">
                         <i class="fas fa-print me-2"></i> PRINT NOW
                     </button>
-                    
-                    <button class="btn btn-outline-secondary w-100 btn-sm mt-2" onclick="resetCreateForm()">
-                        Create Another Transaction
-                    </button>
+                    <button class="btn btn-outline-secondary w-100 btn-sm mt-2" onclick="resetCreateForm()">Create Another Transaction</button>
                 </div>
-
             </div>
         </div>
 
-        <!-- SCANNER -->
+        <!-- SCANNER TAB (FIXED: STATUS + LOCATION DROPDOWNS RETURNED) -->
         <div id="scanner" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold">Scanner</h5>
                 <div id="reader"></div>
                 <div id="scanAction" class="hidden mt-3">
                     <div class="alert alert-info py-2 text-center mb-2">Detected: <strong id="detectedWB">...</strong></div>
+                    
+                    <!-- 1. STATUS DROPDOWN (RESTORED) -->
+                    <label class="small fw-bold text-muted">STATUS</label>
+                    <select id="newStatus" class="form-select mb-2 fw-bold">
+                        <option value="" disabled selected>Select Status</option>
+                        <option>Picked Up</option>
+                        <option>Departed Origin</option>
+                        <option>In Transit</option>
+                        <option>Arrived at Hub</option>
+                        <option>Departed Hub</option>
+                        <option>Out for Delivery</option>
+                        <option>Delivered</option>
+                        <option>RTS (Return To Sender)</option>
+                    </select>
+
+                    <!-- 2. LOCATION DROPDOWN (RESTORED) -->
+                    <label class="small fw-bold text-muted">CURRENT LOCATION</label>
                     <select id="currentLocSelect" class="form-select mb-2" onchange="toggleCustomLoc()">
                         <option value="" disabled selected>Select Hub...</option>
                     </select>
                     <input type="text" id="currentLocCustom" class="form-control mb-2 hidden" placeholder="Type NEW Location Name">
+                    
                     <button class="btn btn-success w-100" onclick="updateStatus()">UPDATE & SAVE</button>
                     <button class="btn btn-secondary w-100 mt-1" onclick="resetScan()">Cancel</button>
                 </div>
             </div>
         </div>
 
-        <!-- TRACKER -->
+        <!-- TRACKER TAB -->
         <div id="tracker" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold">Internal Tracker</h5>
@@ -308,7 +316,7 @@
 
 <script>
     let currentTrackedData = null; 
-    let currentCreatedData = null; // Store created data for printing
+    let currentCreatedData = null;
     let html5QrcodeScanner = null;
 
     function openLogin() { document.getElementById('loginOverlay').classList.remove('hidden'); }
@@ -327,39 +335,10 @@
         if(id === 'users') loadLogs();
         document.getElementById('printArea').innerHTML = '';
         document.getElementById('printArea').style.display = 'none';
-        
-        // Reset Create Form if leaving tab
         if(id !== 'create') resetCreateForm();
     }
 
-    function loadLocations() {
-        const select = document.getElementById('currentLocSelect');
-        const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
-        window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
-            let hubs = defaultHubs;
-            if (docSnap.exists() && docSnap.data().list) hubs = docSnap.data().list;
-            if(!hubs.includes("DELIVERED")) hubs.push("DELIVERED");
-            hubs = [...new Set(hubs)].filter(h => h);
-            let options = `<option value="" disabled selected>Select Action / Location...</option>`;
-            hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
-            options += `<option value="Other">➕ Add New Location...</option>`;
-            select.innerHTML = options;
-        }, () => {
-            let options = `<option value="" disabled selected>Select Hub...</option>`;
-            defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
-            options += `<option value="Other">➕ Add New Location...</option>`;
-            select.innerHTML = options;
-        });
-    }
-
-    function toggleCustomLoc() {
-        const select = document.getElementById('currentLocSelect');
-        const customInput = document.getElementById('currentLocCustom');
-        const note = document.getElementById('customLocNote');
-        if (select.value === "Other") { customInput.classList.remove('hidden'); note.classList.remove('hidden'); customInput.focus(); } else { customInput.classList.add('hidden'); note.classList.add('hidden'); }
-    }
-
-    // --- SCANNER LOGIC ---
+    // --- CAMERA LOGIC ---
     function stopCamera() { if (html5QrcodeScanner) { html5QrcodeScanner.clear(); html5QrcodeScanner = null; } }
     function startCamera() {
         stopCamera();
@@ -374,30 +353,69 @@
     function resetScan() {
         document.getElementById('scanAction').classList.add('hidden');
         document.getElementById('currentLocSelect').value = "";
+        document.getElementById('newStatus').value = "";
         document.getElementById('currentLocCustom').classList.add('hidden');
         startCamera();
     }
 
+    function loadLocations() {
+        const select = document.getElementById('currentLocSelect');
+        const defaultHubs = ["MNL HUB (Manila)", "DVO HUB (Davao)", "CEB HUB (Cebu)", "ILO HUB (Iloilo)", "CGY HUB (Cagayan)", "GES HUB (Gensan)", "Rider (On Delivery)"];
+        window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
+            let hubs = defaultHubs;
+            if (docSnap.exists() && docSnap.data().list) hubs = docSnap.data().list;
+            if(!hubs.includes("DELIVERED")) hubs.push("DELIVERED");
+            hubs = [...new Set(hubs)].filter(h => h);
+            let options = `<option value="" disabled selected>Select Location...</option>`;
+            hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
+            options += `<option value="Other">➕ Add New Location...</option>`;
+            select.innerHTML = options;
+        }, () => {
+            let options = `<option value="" disabled selected>Select Location...</option>`;
+            defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
+            options += `<option value="Other">➕ Add New Location...</option>`;
+            select.innerHTML = options;
+        });
+    }
+
+    function toggleCustomLoc() {
+        const select = document.getElementById('currentLocSelect');
+        const customInput = document.getElementById('currentLocCustom');
+        if (select.value === "Other") { customInput.classList.remove('hidden'); customInput.focus(); } else { customInput.classList.add('hidden'); }
+    }
+
+    // --- RESTORED UPDATE STATUS (TWO FIELDS: STATUS + LOCATION) ---
     async function updateStatus(){ 
         const wb = document.getElementById('detectedWB').innerText; 
-        let l = document.getElementById('currentLocSelect').value;
+        const status = document.getElementById('newStatus').value;
+        let loc = document.getElementById('currentLocSelect').value;
         let isCustom = false;
-        if(l === "Other") { l = document.getElementById('currentLocCustom').value.trim(); isCustom = true; }
-        if(!l) return alert("Select Location");
-        
-        let s = "Arrived at Hub";
-        if (l.toUpperCase().includes("RIDER") || l.toUpperCase().includes("DELIVERY")) s = "Out for Delivery";
-        else if (l.toUpperCase() === "DELIVERED") s = "Delivered";
-        else if (l.toUpperCase().includes("PICKED UP") || l.toUpperCase().includes("ORIGIN")) s = "Picked Up";
+
+        if(loc === "Other") {
+            loc = document.getElementById('currentLocCustom').value.trim();
+            isCustom = true;
+        }
+
+        if(!status || !loc) return alert("Select both Status and Location");
 
         try{ 
-            await window.updateDoc(window.doc(window.db,"parcels",wb), { currentStatus: s, history: window.arrayUnion({ status: s, location: l, time: new Date().toLocaleString(), user: window.currentUserEmail }) }); 
-            if (isCustom) { await window.setDoc(window.doc(window.db, "settings", "locations"), { list: window.arrayUnion(l) }, { merge: true }); }
-            alert(`UPDATED: ${s} - ${l}`); logAction("UPDATE", `${wb} -> ${s} @ ${l}`); resetScan(); 
+            await window.updateDoc(window.doc(window.db,"parcels",wb), {
+                currentStatus: status,
+                history: window.arrayUnion({
+                    status: status,
+                    location: loc,
+                    time: new Date().toLocaleString(),
+                    user: window.currentUserEmail
+                })
+            }); 
+            if (isCustom) { await window.setDoc(window.doc(window.db, "settings", "locations"), { list: window.arrayUnion(loc) }, { merge: true }); }
+            alert(`Updated: ${status} @ ${loc}`); 
+            logAction("UPDATE", `${wb} -> ${status} @ ${loc}`); 
+            resetScan(); 
         } catch(e) { alert("Error: " + e.message); }
     }
 
-    // --- PRINTING LOGIC ---
+    // --- PRINT LAYOUT ---
     function generatePrintLayout(data, startNum, endNum) {
         const printArea = document.getElementById('printArea');
         printArea.innerHTML = ""; printArea.style.display = 'flex';
@@ -464,7 +482,6 @@
         }
     }
     
-    // --- CREATE NEW WORKFLOW (SAVE -> SELECT -> PRINT) ---
     function generateRandomWB(){ document.getElementById('wbInput').value="VG-"+Math.floor(100000+Math.random()*900000); }
     
     async function createParcel(){
@@ -476,20 +493,15 @@
             details:{ qty:document.getElementById('qty').value, weight:document.getElementById('weight').value, handling:document.getElementById('handling').value },
             currentStatus:"Accepted", createdBy:window.currentUserEmail, history:[{status:"Accepted",location:"Origin",time:new Date().toLocaleString(),user:window.currentUserEmail}]
         };
-        
-        if(!d.shipper.name || !d.consignee.name) return alert("Fill All Details");
-        
+        if(!d.shipper.name || !d.consignee.name) return alert("Fill Details");
         try{ 
             await window.setDoc(window.doc(window.db,"parcels",wb),d); 
             logAction("CREATE",wb); 
-            
-            // SHOW PRINT OPTIONS
             currentCreatedData = d;
             document.getElementById('createFormContainer').classList.add('hidden');
             document.getElementById('createPrintOptions').classList.remove('hidden');
             document.getElementById('cpWb').innerText = wb;
-            document.getElementById('cpEnd').value = d.details.qty; // Default Max
-            
+            document.getElementById('cpEnd').value = d.details.qty;
         } catch(e){ alert("Error: "+e.message); }
     }
 
@@ -498,9 +510,7 @@
         const start = parseInt(document.getElementById('cpStart').value);
         const end = parseInt(document.getElementById('cpEnd').value);
         const total = parseInt(currentCreatedData.details.qty);
-
         if(start < 1 || end > total || start > end) return alert(`Invalid Range. Max is ${total}.`);
-
         generatePrintLayout(currentCreatedData, start, end);
         setTimeout(() => window.print(), 800);
     }
@@ -508,8 +518,6 @@
     function resetCreateForm() {
         document.getElementById('createPrintOptions').classList.add('hidden');
         document.getElementById('createFormContainer').classList.remove('hidden');
-        
-        // Clear Inputs
         document.getElementById('shipperName').value = "";
         document.getElementById('shipperAddr').value = "";
         document.getElementById('shipperContact').value = "";
@@ -518,11 +526,9 @@
         document.getElementById('consigneeContact').value = "";
         document.getElementById('qty').value = "1";
         document.getElementById('weight').value = "";
-        
         generateRandomWB();
     }
 
-    // --- OTHER FUNCTIONS ---
     function reprintRange() { if(!currentTrackedData) return; const start = parseInt(document.getElementById('rpStart').value); const end = parseInt(document.getElementById('rpEnd').value); const total = parseInt(currentTrackedData.details.qty); if(start < 1 || end > total || start > end) return alert(`Invalid Range. Max is ${total}.`); generatePrintLayout(currentTrackedData, start, end); setTimeout(() => window.print(), 800); }
     async function publicTrack(){ trackLogic(document.getElementById('publicSearchInput').value.trim(), document.getElementById('publicResult')); }
     async function staffTrackParcel(){ const wb=document.getElementById('staffTrackInput').value.trim(); const r=document.getElementById('staffTrackResult'); document.getElementById('reprintSection').classList.add('hidden'); const d=await trackLogic(wb,r); if(d){ currentTrackedData=d; document.getElementById('reprintSection').classList.remove('hidden'); document.getElementById('rpEnd').value = d.details.qty; } }
