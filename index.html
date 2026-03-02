@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VG Freightage Domestic System</title>
+    <title>VG Freightage - Graziie System</title>
     
     <!-- CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -43,37 +43,89 @@
 
         #reader { width: 100%; min-height: 300px; background: #000; border-radius: 10px; margin-bottom: 15px; }
 
-        /* PRINT STYLES */
+        /* --- PRINT STYLES FOR GRAZIIE TP518 (100mm x 150mm) --- */
         #printArea { display: none; }
         @media print {
-            #publicView, #staffView, #loginOverlay, .navbar { display: none !important; }
+            /* Hide UI Elements */
+            #publicView, #staffView, #loginOverlay, .navbar, .hero-section { display: none !important; }
+            
+            /* Print Area Setup */
+            body, html { margin: 0; padding: 0; height: 100%; background: white; }
             #printArea { display: block !important; width: 100%; margin: 0; padding: 0; }
-            @page { size: 100mm 150mm; margin: 0; }
-            .sticker-page { width: 100mm; height: 149mm; margin: 0 auto; border: 2px solid black; background: white; color: black; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; box-sizing: border-box; padding: 0; page-break-after: always; break-after: always; page-break-inside: avoid; overflow: hidden; }
+            
+            /* A6 Setting (Standard Thermal Sticker) */
+            @page { 
+                size: 100mm 150mm; 
+                margin: 0mm; /* Zero margin para sagad sa sticker */
+            }
+
+            .sticker-page { 
+                width: 100mm; 
+                height: 148mm; /* Slightly smaller than 150mm to prevent blank page */
+                margin: 0 auto; 
+                border: 2px solid black; 
+                background: white; 
+                color: black; 
+                font-family: 'Arial', sans-serif; 
+                display: flex; 
+                flex-direction: column; 
+                box-sizing: border-box; 
+                padding: 2mm; /* Internal padding */
+                page-break-after: always; 
+                break-after: always; 
+                overflow: hidden; 
+                position: relative;
+            }
             .sticker-page:last-child { page-break-after: auto; }
-            .wb-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-bottom: 2px solid black; background: #eee; -webkit-print-color-adjust: exact; }
+
+            /* Header Section */
+            .wb-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 5px; }
             .wb-brand-box { display: flex; align-items: center; gap: 5px; }
-            .wb-logo { height: 20px; }
-            .wb-company-text { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: bold; color: black; letter-spacing: 0.5px; }
-            .wb-date { font-size: 9px; font-weight: bold; }
-            .wb-sort-zone { background: black; color: white; text-align: center; font-family: 'Oswald', sans-serif; font-size: 42px; font-weight: bold; line-height: 1; padding: 2px 0; letter-spacing: 3px; text-transform: uppercase; border-bottom: 2px solid black; -webkit-print-color-adjust: exact; }
-            .wb-warning-banner { background: white; color: black; border-bottom: 2px solid black; text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900; font-size: 24px; padding: 5px; text-transform: uppercase; letter-spacing: 2px; display: none; }
-            .wb-warning-banner.show { display: block; background: black !important; color: white !important; -webkit-print-color-adjust: exact; }
-            .wb-qr-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 2px solid black; }
-            .wb-id-box { text-align: left; }
-            .wb-id-label { font-size: 8px; color: #555; font-weight: bold; text-transform: uppercase; }
-            .wb-id-text { font-size: 26px; font-weight: 900; letter-spacing: 1px; font-family: 'Oswald', sans-serif; }
-            .wb-qr-code { padding: 0; } 
-            .wb-sender { padding: 8px; border-bottom: 1px solid black; font-size: 11px; line-height: 1.2; }
-            .wb-receiver { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-            .wb-tag { background: black; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; display: inline-block; width: fit-content; margin-bottom: 5px; -webkit-print-color-adjust: exact; }
-            .wb-rcv-name { font-size: 32px; font-weight: 900; line-height: 1.1; margin-bottom: 5px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
-            .wb-rcv-addr { font-size: 14px; font-weight: bold; line-height: 1.2; margin-bottom: 3px; }
-            .wb-footer { display: flex; border-top: 3px solid black; height: 50px; }
-            .wb-f-item { flex: 1; border-right: 2px solid black; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+            .wb-logo { height: 25px; filter: grayscale(100%); } /* Print in B&W */
+            .wb-company-text { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: bold; color: black; }
+            .wb-date { font-size: 10px; font-weight: bold; }
+
+            /* Sort Zone (Huge Code) */
+            .wb-sort-zone { 
+                background: black !important; 
+                color: white !important; 
+                text-align: center; 
+                font-family: 'Oswald', sans-serif; 
+                font-size: 48px; 
+                font-weight: 900; 
+                line-height: 1; 
+                padding: 5px 0; 
+                text-transform: uppercase; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                margin-bottom: 5px;
+            }
+
+            /* Warning Banner */
+            .wb-warning-banner { text-align: center; font-family: 'Oswald', sans-serif; font-weight: 900; font-size: 20px; text-transform: uppercase; border: 2px solid black; margin-bottom: 5px; display: none; }
+            .wb-warning-banner.show { display: block; }
+
+            /* QR & Waybill */
+            .wb-qr-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 5px; }
+            .wb-id-box { text-align: left; width: 60%; }
+            .wb-id-label { font-size: 10px; font-weight: bold; text-transform: uppercase; }
+            .wb-id-text { font-size: 28px; font-weight: 900; font-family: 'Oswald', sans-serif; word-break: break-all; line-height: 1; }
+            .wb-qr-code { width: 35%; display: flex; justify-content: flex-end; }
+            .wb-qr-code img { max-width: 100%; height: auto; }
+
+            /* Shipper & Receiver */
+            .wb-sender { font-size: 11px; line-height: 1.2; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+            .wb-receiver { flex-grow: 1; display: flex; flex-direction: column; }
+            .wb-tag { background: black !important; color: white !important; font-size: 12px; font-weight: bold; padding: 2px 6px; display: inline-block; width: fit-content; margin-bottom: 5px; -webkit-print-color-adjust: exact; }
+            .wb-rcv-name { font-size: 24px; font-weight: 900; line-height: 1.1; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+            .wb-rcv-addr { font-size: 14px; font-weight: bold; line-height: 1.2; margin-top: 5px; }
+
+            /* Footer Stats */
+            .wb-footer { display: flex; border-top: 3px solid black; margin-top: auto; padding-top: 5px; }
+            .wb-f-item { flex: 1; border-right: 2px solid black; text-align: center; }
             .wb-f-item:last-child { border-right: none; }
-            .wb-f-lbl { font-size: 9px; font-weight: bold; text-transform: uppercase; }
-            .wb-f-val { font-size: 18px; font-weight: 900; }
+            .wb-f-lbl { font-size: 10px; font-weight: bold; text-transform: uppercase; }
+            .wb-f-val { font-size: 20px; font-weight: 900; font-family: 'Oswald', sans-serif; }
         }
     </style>
 </head>
@@ -195,7 +247,7 @@
             </div>
         </div>
 
-        <!-- SCANNER TAB (FIXED: STATUS + LOCATION DROPDOWNS RETURNED) -->
+        <!-- SCANNER TAB -->
         <div id="scanner" class="staff-page hidden">
             <div class="card p-4">
                 <h5 class="text-primary fw-bold">Scanner</h5>
@@ -203,7 +255,6 @@
                 <div id="scanAction" class="hidden mt-3">
                     <div class="alert alert-info py-2 text-center mb-2">Detected: <strong id="detectedWB">...</strong></div>
                     
-                    <!-- 1. STATUS DROPDOWN (RESTORED) -->
                     <label class="small fw-bold text-muted">STATUS</label>
                     <select id="newStatus" class="form-select mb-2 fw-bold">
                         <option value="" disabled selected>Select Status</option>
@@ -217,7 +268,6 @@
                         <option>RTS (Return To Sender)</option>
                     </select>
 
-                    <!-- 2. LOCATION DROPDOWN (RESTORED) -->
                     <label class="small fw-bold text-muted">CURRENT LOCATION</label>
                     <select id="currentLocSelect" class="form-select mb-2" onchange="toggleCustomLoc()">
                         <option value="" disabled selected>Select Hub...</option>
@@ -364,25 +414,15 @@
         
         window.onSnapshot(window.doc(window.db, "settings", "locations"), (docSnap) => {
             let hubs = defaultHubs;
-            
-            // Kunin ang listahan sa database kung meron
             if (docSnap.exists() && docSnap.data().list) {
                 hubs = docSnap.data().list;
             }
-
-            // TINANGGAL KO NA DITO YUNG CODE NA NAGDADAGDAG NG "DELIVERED"
-            
-            // Tanggalin ang duplicates
             hubs = [...new Set(hubs)].filter(h => h);
-            
             let options = `<option value="" disabled selected>Select Location...</option>`;
             hubs.sort().forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
             options += `<option value="Other">➕ Add New Location...</option>`;
-            
-            // Update the dropdown
             select.innerHTML = options;
         }, () => {
-            // Fallback kung may error
             let options = `<option value="" disabled selected>Select Location...</option>`;
             defaultHubs.forEach(hub => { options += `<option value="${hub}">${hub}</option>`; });
             options += `<option value="Other">➕ Add New Location...</option>`;
@@ -396,7 +436,6 @@
         if (select.value === "Other") { customInput.classList.remove('hidden'); customInput.focus(); } else { customInput.classList.add('hidden'); }
     }
 
-    // --- RESTORED UPDATE STATUS (TWO FIELDS: STATUS + LOCATION) ---
     async function updateStatus(){ 
         const wb = document.getElementById('detectedWB').innerText; 
         const status = document.getElementById('newStatus').value;
@@ -430,7 +469,7 @@
     // --- PRINT LAYOUT ---
     function generatePrintLayout(data, startNum, endNum) {
         const printArea = document.getElementById('printArea');
-        printArea.innerHTML = ""; printArea.style.display = 'flex';
+        printArea.innerHTML = ""; printArea.style.display = 'block';
         
         let destinationCode = "DOM";
         const dest = data.consignee.addr.toUpperCase();
@@ -457,7 +496,7 @@
                 <div class="wb-header">
                     <div class="wb-brand-box">
                         <img src="logo.png" class="wb-logo" onerror="this.style.display='none'">
-                        <span class="wb-company-text">VG FREIGHTAGE DOMESTIC</span>
+                        <span class="wb-company-text">VG FREIGHTAGE</span>
                     </div>
                     <span class="wb-date">${new Date().toLocaleDateString()}</span>
                 </div>
@@ -481,16 +520,17 @@
                 <div class="wb-receiver">
                     <div class="wb-tag">DESTINATION</div>
                     <div class="wb-rcv-name">${data.consignee.addr}</div>
+                    <div class="wb-rcv-addr"><strong>TO:</strong> ${data.consignee.name}</div>
                 </div>
                 
                 <div class="wb-footer">
                     <div class="wb-f-item"><div class="wb-f-lbl">WEIGHT</div><div class="wb-f-val">${data.details.weight}</div></div>
                     <div class="wb-f-item"><div class="wb-f-lbl">PCS</div><div class="wb-f-val">${i}/${totalPcs}</div></div>
-                    <div class="wb-f-item" style="font-size:8px;">Sign Here</div>
+                    <div class="wb-f-item" style="font-size:10px; display:flex; justify-content:center; align-items:center;">Sign</div>
                 </div>
             `;
             printArea.appendChild(sticker);
-            new QRCode(document.getElementById(`qr-${data.waybill}-${i}`), { text: data.waybill, width: 140, height: 140 });
+            new QRCode(document.getElementById(`qr-${data.waybill}-${i}`), { text: data.waybill, width: 128, height: 128 });
         }
     }
     
